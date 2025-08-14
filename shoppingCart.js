@@ -30,39 +30,26 @@ var purchases = [
   }
 ];
 /* Functions */
-var getDiscountPercent = function (productName) {
-  if(discounts[productName]){
-    return discounts[productName];
-  }
-  return 0;
-};
+const getDiscountPercent = (productName) => discounts[productName] ? discounts[productName] : 0;
+  
+const getTaxPercent = (productName) => taxes[productName] ? taxes[productName] : 0; 
 
-var getTaxPercent = function (productName) {
-  if(taxes[productName]){
-    return taxes[productName];
-  }
-  return 0;
-    
-};
+const getUnitPrice = (itemName) => rates[itemName];
 
-var getUnitPrice = function (itemName) {
-    if(rates[itemName]){
-      return rates[itemName];
-    }
-};
+const getLineItemPrice = (lineItem) => lineItem.units * getUnitPrice(lineItem.item);
 
-var getSum = function () {
+const getSum = () => {
    return purchases.reduce((acc,cur) => {
-   let itemPrice = cur.units * getUnitPrice(cur.item);
-   let discountPrice = itemPrice - (getDiscountPercent(cur.item)/100) * itemPrice;
-   let taxPrice = discountPrice +  (getTaxPercent(cur.item)/100) * discountPrice;
-   return acc + taxPrice ;
+   const itemPrice = getLineItemPrice(cur);
+   const afterDiscount = itemPrice - (getDiscountPercent(cur.item)/100) * itemPrice;
+   const afterTax = afterDiscount +  (getTaxPercent(cur.item)/100) * afterDiscount;
+   return acc + afterTax;
   },0)
 };
 
 // Do not change below this line.
 /* Main Function */
-var main = function main() {
+const main = () => {
   console.log("Total Bill :",getSum());
   }
 
