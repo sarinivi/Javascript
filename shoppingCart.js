@@ -1,58 +1,45 @@
-var rates = {
+// Refactored shoppingCart.js
+
+const rates = {
   Carrot: 10,
   Apple: 200,
   Guava: 50,
 };
 
-var discounts = {
-  // values are in percentages.
-  Apple: 10
+const discounts = {
+  Apple: 10, // values are in percentages
 };
 
-var taxes = {
-  // values are in percentages.
+const taxes = {
   Carrot: 5,
-  Guava: 10
+  Guava: 10, // values are in percentages
 };
 
-var purchases = [
-  {
-    item: 'Carrot',
-    units: 20,
-  },
-  {
-    item: 'Apple',
-    units: 2,
-  },
-  {
-    item: 'Guava',
-    units: 1,
-  }
+const purchases = [
+  { item: 'Carrot', units: 20 },
+  { item: 'Apple', units: 2 },
+  { item: 'Guava', units: 1 },
 ];
-/* Functions */
-const getDiscountPercent = (productName) => discounts[productName] ? discounts[productName] : 0;
-  
-const getTaxPercent = (productName) => taxes[productName] ? taxes[productName] : 0; 
 
+// Functions
+const getDiscountPercent = (productName) => discounts[productName] || 0;
+const getTaxPercent = (productName) => taxes[productName] || 0;
 const getUnitPrice = (itemName) => rates[itemName];
 
-const getLineItemPrice = (lineItem) => lineItem.units * getUnitPrice(lineItem.item);
+const getLineItemPrice = ({ item, units }) => units * getUnitPrice(item);
 
 const getSum = () => {
-   return purchases.reduce((acc,cur) => {
-   const itemPrice = getLineItemPrice(cur);
-   const afterDiscount = itemPrice - (getDiscountPercent(cur.item)/100) * itemPrice;
-   const afterTax = afterDiscount +  (getTaxPercent(cur.item)/100) * afterDiscount;
-   return acc + afterTax;
-  },0)
+  return purchases.reduce((acc, { item, units }) => {
+    const itemPrice = getLineItemPrice({ item, units });
+    const afterDiscount = itemPrice - (getDiscountPercent(item) / 100) * itemPrice;
+    const afterTax = afterDiscount + (getTaxPercent(item) / 100) * afterDiscount;
+    return acc + afterTax;
+  }, 0);
 };
 
-// Do not change below this line.
-/* Main Function */
+// Main function
 const main = () => {
-  console.log("Total Bill :",getSum());
-  }
+  console.log("Total Bill :", getSum());
+};
 
 main();
-
-//Find total price for items in cart.
