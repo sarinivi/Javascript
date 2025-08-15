@@ -52,12 +52,12 @@ const transactions = [
 ];
 
 const displayBalance = () => {
-    accounts.forEach((account)=> account.balance = balances[account.accountNo]);
+    accounts.map((account)=> account.balance = balances[account.accountNo]);
     console.log(accounts);
 }
 
 const updateAfterTransaction = () => {
-    transactions.forEach((transaction) => {
+    transactions.map((transaction) => {
         if(transaction.type === 'withdrawal'){
            balances[transaction.accountNo] -= transaction.amount;
         }
