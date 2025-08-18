@@ -1,7 +1,5 @@
 // random number
-const getRandomNumber = (min,max) => {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
+const getRandomNumber = (min,max) => Math.floor(Math.random() * (max - min + 1)) + min;
 
 //generate randomchar 
 const getRandomCharacter = () => String.fromCharCode(getRandomNumber(97,122));
@@ -15,17 +13,16 @@ const getRandomString = (length) => {
     return generatedRandomString;
 }
 
-//uuid
 const getRandomUUID = (myArr) => {
-    let generatedRandomUUId = "";
-    for(let i=0; i < myArr.length; i++){
-        generatedRandomUUId += getRandomString(myArr[i])
-       if(i < myArr.length - 1){
-        generatedRandomUUId += "-";
-       }
+  let generatedRandomUUId =  myArr.reduce((acc,stringLength, i) => {
+    acc += getRandomString(stringLength);
+    if (i < myArr.length - 1) {
+      acc += "-";
     }
-    return generatedRandomUUId;
-}
+    return acc;
+  },"");
+  return generatedRandomUUId;
+};
 
 
 const main = () => {
