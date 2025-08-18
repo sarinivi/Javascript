@@ -30,6 +30,7 @@ const distances = [
     distance: 83,
   },
 ];
+
 const routes = [
  
   {
@@ -54,32 +55,24 @@ const routes = [
   },
 ];
 
-const findTotalDistance = (route) => {
-  return route.stops.reduce((acc, stop, i) => {
-    if (i < route.stops.length - 1) {
-      const updatedDistance = distances.find((distance) =>
-          (distance.start === stop && distance.end === route.stops[i + 1]) ||
-          (distance.start === route.stops[i + 1] && distance.end === stop)
-      );
-      if (updatedDistance) {
-        acc += updatedDistance.distance;
-      }
-    }
-    return acc;
-  }, 0);
-};
-
-const totalDistance = () => {
-  return routes.map((route) => {
-     const getDistance = findTotalDistance(route);
-        return{
-            ...route,
-            totalDistance : getDistance
-        }
-    })
+const getDistance = (start, end) => {  
+    return distances.find(distance => (distance.start === start && distance.end === end) || 
+    (distance.start === end && distance.end === start)).distance || 0 ;
 }
+
+const findTotalDistance = (route) => {
+  return route.stops.reduce((total, currentStop, index, stops) => 
+    index === stops.length - 1 
+      ? total 
+      : total + getDistance(currentStop, stops[index + 1])
+  , 0);
+}
+
+
+const updatedDistance = () => routes.map(route => ({ ...route, totalDistance: findTotalDistance(route) }));
+
 
 const main = () => {
-  console.log(totalDistance());
-}
+  console.log(updatedDistance());
+};
 main();
