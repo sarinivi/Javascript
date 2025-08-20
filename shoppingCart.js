@@ -1,5 +1,4 @@
 // Refactored shoppingCart.js
-
 const rates = {
   Carrot: 10,
   Apple: 200,
@@ -23,7 +22,9 @@ const purchases = [
 
 // Functions
 const getDiscountPercent = (productName) => discounts[productName] || 0;
+
 const getTaxPercent = (productName) => taxes[productName] || 0;
+
 const getUnitPrice = (itemName) => rates[itemName];
 
 const getLineItemPrice = ({ item, units }) => units * getUnitPrice(item);
@@ -31,9 +32,9 @@ const getLineItemPrice = ({ item, units }) => units * getUnitPrice(item);
 const getSum = () => {
   return purchases.reduce((acc, { item, units }) => {
     const itemPrice = getLineItemPrice({ item, units });
-    const afterDiscount = itemPrice - (getDiscountPercent(item) / 100) * itemPrice;
-    const afterTax = afterDiscount + (getTaxPercent(item) / 100) * afterDiscount;
-    return acc + afterTax;
+    const discountPrice = itemPrice - (getDiscountPercent(item) / 100) * itemPrice;
+    const taxPrice = discountPrice + (getTaxPercent(item) / 100) * discountPrice;
+    return acc + taxPrice;
   }, 0);
 };
 
@@ -41,5 +42,4 @@ const getSum = () => {
 const main = () => {
   console.log("Total Bill :", getSum());
 };
-
 main();
