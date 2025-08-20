@@ -1,7 +1,16 @@
 const accounts = [
-    { name: 'Arun', accountNo: '001' },
-    { name: 'Babu', accountNo: '002' },
-    { name: 'Chandra', accountNo: '003' }
+    { 
+        name: 'Arun', 
+        accountNo: '001' 
+    },
+    { 
+        name: 'Babu', 
+        accountNo: '002' 
+    },
+    { 
+        name: 'Chandra', 
+        accountNo: '003' 
+    }
 ];
 
 const balances = {
@@ -11,12 +20,36 @@ const balances = {
 };
 
 const transactions = [
-    { accountNo: '001', type: 'withdrawal', amount: 1000 },
-    { accountNo: '001', type: 'deposit', amount: 500 },
-    { accountNo: '001', type: 'withdrawal', amount: 1000 },
-    { accountNo: '002', type: 'deposit', amount: 300 },
-    { accountNo: '002', type: 'withdrawal', amount: 200 },
-    { accountNo: '003', type: 'deposit', amount: 200 }
+    { 
+        accountNo: '001', 
+        type: 'withdrawal', 
+        amount: 1000 
+    },
+    { 
+        accountNo: '001', 
+        type: 'deposit', 
+        amount: 500 
+    },
+    { 
+        accountNo: '001', 
+        type: 'withdrawal', 
+        amount: 1000 
+    },
+    { 
+        accountNo: '002', 
+        type: 'deposit', 
+        amount: 300 
+    },
+    { 
+        accountNo: '002', 
+        type: 'withdrawal', 
+        amount: 200 
+    },
+    { 
+        accountNo: '003', 
+        type: 'deposit', 
+        amount: 200 
+    }
 ];
 
 const displayBalances = () => {
@@ -28,13 +61,9 @@ const displayBalances = () => {
 };
 
 const updateBalancesAfterTransactions = () => {
-    transactions.forEach(({accountNo, type, amount}) => {
-        if(type === 'withdrawal') {
-                balances[accountNo] -= amount;
-            } else {
-            balances[accountNo] += amount;
-        }
-    });
+  transactions.forEach(({ accountNo, type, amount }) => {
+    balances[accountNo] += (type === 'withdrawal' ? -amount : amount);
+  });
 };
 
 const main = () => {
@@ -46,5 +75,4 @@ const main = () => {
     console.log("After Transaction:");
     displayBalances();
 };
-
 main();
