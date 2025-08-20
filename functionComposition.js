@@ -20,10 +20,10 @@ const getRandomUUID = (lengthsArray) => {
 };
 
 const main = () => {
-  console.log(getRandomNumber(97, 122));
+    console.log(getRandomNumber(97, 122));
     console.log(getRandomCharacter());
     console.log(getRandomString(8));
-  const myArr = [8, 4, 4, 4, 12];
+    const myArr = [8, 4, 4, 4, 12];
     console.log(getRandomUUID(myArr));
 };
 main();

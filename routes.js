@@ -32,13 +32,12 @@ const distances = [
 ];
 
 const routes = [
- 
   {
     start: "chennai",
     end: "trichy",
     stops: ["chennai", "villupuram", "trichy"],
   },
-      {
+  {
     start: "villupuram",
     end: "chennai",
     stops: ["villupuram", "chennai"],
@@ -68,9 +67,7 @@ const findTotalDistance = (route) => {
   , 0);
 }
 
-
 const updatedDistance = () => routes.map(route => ({ ...route, totalDistance: findTotalDistance(route) }));
-
 
 const main = () => {
   console.log(updatedDistance());
