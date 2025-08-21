@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@laufire/utils": "^3.0.0-1",
     "js-utils": "^2.1.0"
-  }
+  },
+  "type": "module"
 }
