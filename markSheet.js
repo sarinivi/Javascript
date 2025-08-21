@@ -1,4 +1,18 @@
-const { markSheets, subjects, passMarks } = require('./markSheetData.js');
+import csv from 'csvtojson';
+import path, { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const subjects = ['tamil', 'english', 'maths', 'science', 'social'];
+
+const passMarks = {
+  tamil: 35,
+  english: 35,
+  maths: 35,
+  science: 35,
+  social: 35,
+};
 
 const getTotal = marks => marks.reduce((acc, cur) => acc + cur, 0);
 
@@ -15,7 +29,7 @@ const calculateRank = (rank, sameRankCount, updateRank) =>
 const calculateSameRankCount = (sameRankCount, updateSameScore, updateRank) =>
   updateSameScore ? sameRankCount + 1 : updateRank ? 0 : sameRankCount;
 
-const assignRank = sortedMarkSheets => {
+const assignRank = (sortedMarkSheets) => {
   let rank = 0;
   let sameRankCount = 0;
   let prevTotal = null;
@@ -49,7 +63,7 @@ const getCount = rankedMarkSheets => {
 
 const updateMarkSheets = markSheets => {
   const processedMarkSheets = markSheets.map(markSheet => {
-    const marks = subjects.map(subject => markSheet[subject]);
+    const marks = subjects.map(subject => Number(markSheet[subject]));
     return {
       ...markSheet,
       total: getTotal(marks),
@@ -62,9 +76,18 @@ const updateMarkSheets = markSheets => {
 };
 
 const main = () => {
-  const studentDetails = updateMarkSheets(markSheets);
+  const csvFilePath = path.join(__dirname, 'markSheetData.csv');
+  csv()
+    .fromFile(csvFilePath)
+    .then((markSheets) => {
+      const studentDetails = updateMarkSheets(markSheets);
 
-  console.table(studentDetails.students);
-  console.log("Students Pass Count:",studentDetails.passCount,"and Fail Count:",studentDetails.failCount);
+      console.table(studentDetails.students);
+      console.log("Students Pass Count:", studentDetails.passCount, "and Fail Count:", studentDetails.failCount);
+    })
+    .catch((err) => {
+      console.error('Error reading CSV:', err);
+    });
 };
+
 main();
