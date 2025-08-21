@@ -1,3 +1,6 @@
+import pkg from '@laufire/utils/collection.js';
+const { map, find } = pkg;
+
 const distances = [
   {
     start: "chennai",
@@ -55,7 +58,7 @@ const routes = [
 ];
 
 const getDistance = (start, end) => {  
-    return distances.find(distance => (distance.start === start && distance.end === end) || 
+    return find(distances, distance => (distance.start === start && distance.end === end) || 
     (distance.start === end && distance.end === start)).distance || 0 ;
 }
 
@@ -67,7 +70,7 @@ const findTotalDistance = (route) => {
   , 0);
 }
 
-const updatedDistance = () => routes.map(route => ({ ...route, totalDistance: findTotalDistance(route) }));
+const updatedDistance = () => map(routes, route => ({ ...route, totalDistance: findTotalDistance(route) }));
 
 const main = () => {
   console.log(updatedDistance());
