@@ -47,7 +47,7 @@ const getCount = rankedMarkSheets => {
   };
 };
 
-const updatedMarkSheets = markSheets => {
+const updateMarkSheets = markSheets => {
   const processedMarkSheets = markSheets.map(markSheet => {
     const marks = subjects.map(subject => markSheet[subject]);
     return {
@@ -62,7 +62,7 @@ const updatedMarkSheets = markSheets => {
 };
 
 const main = () => {
-  const studentDetails = updatedMarkSheets(markSheets);
+  const studentDetails = updateMarkSheets(markSheets);
 
   console.table(studentDetails.students);
   console.log("Students Pass Count:",studentDetails.passCount,"and Fail Count:",studentDetails.failCount);
