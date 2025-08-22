@@ -75,19 +75,17 @@ const updateMarkSheets = markSheets => {
   return getCount(rankedMarkSheets);
 };
 
-const main = () => {
-  const csvFilePath = path.join(__dirname, 'markSheetData.csv');
-  csv()
-    .fromFile(csvFilePath)
-    .then((markSheets) => {
-      const studentDetails = updateMarkSheets(markSheets);
+const main = async () => {
+  try {
+    const csvFilePath = path.join(__dirname, 'markSheetData.csv');
+    const markSheets = await csv().fromFile(csvFilePath);
+    const studentDetails = updateMarkSheets(markSheets);
 
-      console.table(studentDetails.students);
-      console.log("Students Pass Count:", studentDetails.passCount, "and Fail Count:", studentDetails.failCount);
-    })
-    .catch((err) => {
-      console.error('Error reading CSV:', err);
-    });
+    console.table(studentDetails.students);
+    console.log("Students Pass Count:", studentDetails.passCount, "and Fail Count:", studentDetails.failCount);
+  } catch (err) {
+    console.error('Error reading CSV:', err);
+  }
 };
 
 main();
