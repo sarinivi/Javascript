@@ -1,12 +1,12 @@
 import csvToJson from 'csvtojson';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
+import pkg from '@laufire/utils/collection.js';
+const { map, find, values, keys } = pkg;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const subjects = ['tamil', 'english', 'maths', 'science', 'social'];
-
-const passMarks = {
+const subjectWisePassMarks = {
   tamil: 35,
   english: 35,
   maths: 35,
@@ -16,8 +16,8 @@ const passMarks = {
 
 const getTotal = marks => marks.reduce((acc, cur) => acc + cur, 0);
 
-const getResult = student =>
-  subjects.find(subject => student[subject] < passMarks[subject]) ? "fail" : "pass";
+const getResult = markSheet =>
+ find((subjectWisePassMarks), (mark, subject) => markSheet[subject] < mark) ? "fail" : "pass";
 
 const isPass = student => student.result === "pass";
 
@@ -32,36 +32,37 @@ const calculateSameRankCount = (sameRankCount, updateSameScore, updateRank) =>
 const assignRank = (sortedMarkSheets) => {
   let rank = 0;
   let sameRankCount = 0;
-  let prevTotal = null;
+  let prevTotal = 0;
 
-  return sortedMarkSheets.map(student => {
-    const pass = isPass(student);
-    const sameScore = hasSameScoreAsPrev(student, prevTotal);
+  return sortedMarkSheets.map(markSheet => {
+    const pass = isPass(markSheet);
+    const sameScore = hasSameScoreAsPrev(markSheet, prevTotal);
     const updateRank = pass && !sameScore;
     const updateSameScore = pass && sameScore;
     rank = calculateRank(rank, sameRankCount, updateRank);
     sameRankCount = calculateSameRankCount(sameRankCount, updateSameScore, updateRank);
-    prevTotal = student.total;
+    prevTotal = markSheet.total;
     return {
-      ...student,
+      ...markSheet,
       rank: pass ? rank : "-"
     };
   });
 };
 
 const getCount = rankedMarkSheets => {
-  const totalPassCount = rankedMarkSheets.filter(student => student.result === "pass").length;
-  const totalFailCount = rankedMarkSheets.length - totalPassCount;
+  const passCount = rankedMarkSheets.filter(isPass).length;
+  const failCount = rankedMarkSheets.length - passCount;
   return {
     students: rankedMarkSheets,
-    passCount: totalPassCount,
-    failCount: totalFailCount
+    passCount: passCount,
+    failCount: failCount
   };
 };
 
 const updateMarkSheets = markSheets => {
-  const processedMarkSheets = markSheets.map(markSheet => {
-    const marks = subjects.map(subject => Number(markSheet[subject]));
+  const processedMarkSheets = map(markSheets, (markSheet) => {
+    
+    const marks = map(keys(subjectWisePassMarks), (subject) => Number(markSheet[subject]));
     return {
       ...markSheet,
       total: getTotal(marks),
@@ -75,13 +76,13 @@ const updateMarkSheets = markSheets => {
 
 const getInput = async () => {
   const markSheets = await csvToJson().fromFile(path.join(__dirname, 'markSheetData.csv'));
-  return { markSheets };
+  return  markSheets ;
 };
 
 const main = async () => {
   try {
     const inputData = await getInput();
-    const studentDetails = updateMarkSheets(inputData.markSheets);
+    const studentDetails = updateMarkSheets(inputData);
 
     console.table(studentDetails.students);
     console.log("Students Pass Count:", studentDetails.passCount, "and Fail Count:", studentDetails.failCount);
@@ -90,3 +91,4 @@ const main = async () => {
   }
 };
 main();
+
