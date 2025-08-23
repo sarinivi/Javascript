@@ -1,4 +1,4 @@
-import csv from 'csvtojson';
+import csvToJson from 'csvtojson';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -39,11 +39,9 @@ const assignRank = (sortedMarkSheets) => {
     const sameScore = hasSameScoreAsPrev(student, prevTotal);
     const updateRank = pass && !sameScore;
     const updateSameScore = pass && sameScore;
-
     rank = calculateRank(rank, sameRankCount, updateRank);
     sameRankCount = calculateSameRankCount(sameRankCount, updateSameScore, updateRank);
     prevTotal = student.total;
-
     return {
       ...student,
       rank: pass ? rank : "-"
@@ -75,11 +73,15 @@ const updateMarkSheets = markSheets => {
   return getCount(rankedMarkSheets);
 };
 
+const getInput = async () => {
+  const markSheets = await csvToJson().fromFile(path.join(__dirname, 'markSheetData.csv'));
+  return { markSheets };
+};
+
 const main = async () => {
   try {
-    const csvFilePath = path.join(__dirname, 'markSheetData.csv');
-    const markSheets = await csv().fromFile(csvFilePath);
-    const studentDetails = updateMarkSheets(markSheets);
+    const inputData = await getInput();
+    const studentDetails = updateMarkSheets(inputData.markSheets);
 
     console.table(studentDetails.students);
     console.log("Students Pass Count:", studentDetails.passCount, "and Fail Count:", studentDetails.failCount);
@@ -87,5 +89,4 @@ const main = async () => {
     console.error('Error reading CSV:', err);
   }
 };
-
 main();
