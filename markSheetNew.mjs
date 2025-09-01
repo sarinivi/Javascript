@@ -1,6 +1,6 @@
 import csv from "csvtojson";
 import pkg from '@laufire/utils/collection.js';
-const { map, keys, reduce, find, sort, filter } = pkg;
+const { map, keys, reduce, find } = pkg;
 
 const inputData = './markSheetData.csv';
 
@@ -12,40 +12,68 @@ const subjectWisePassMarks = {
   social: 35,
 };
 
+const subjects = keys(subjectWisePassMarks);
+
 const getTotal = (marks) =>
-  reduce(marks, (curMark, nextMark) => curMark + nextMark, 0);
+  reduce(marks, (currentMark, nextMark) => currentMark + nextMark, 0);
 
 const getResult = (marks, subjects) =>
-  find(marks, (mark, index) => mark < subjectWisePassMarks[subjects[index]]) ? "fail" : "pass";
+  find(marks, (mark, index) => mark < subjectWisePassMarks[subjects[index]])
+    ? "fail"
+    : "pass";
 
 const processMarkSheet = (markSheet) => {
-    const subjects = keys(subjectWisePassMarks);
-    const marks = map(subjects, (subject) => markSheet[subject]); 
-    return {
-      ...markSheet,
-      total: getTotal(marks),
-      result: getResult(marks, subjects),
-    };
-  };
+  const marks = map(subjects, (subject) => markSheet[subject]);
 
-const assignRank = (markSheets) =>
-  map(markSheets, (markSheet, index, array) => ({
+  return {
     ...markSheet,
-    Rank: markSheet.result === "pass"
-      ? 1 +
-        filter(array, (student) => student.result === "pass" && student.total > markSheet.total).length
-      : "-", 
-  }));
+    total: getTotal(marks),
+    result: getResult(marks, subjects),
+  };
+};
 
-const getCounts = (processedMarkSheets) => ({
-  passCount: filter(processedMarkSheets, (markSheet) => markSheet.result === "pass").length,
-  failCount: filter(processedMarkSheets, (markSheet) => markSheet.result === "fail").length,
+const assignRank = (markSheets) => {
+  let lastAssignedRank = 0;
+
+  return markSheets.map((markSheet, index, array) =>
+    ({
+      ...markSheet,
+      rank: markSheet.result === "pass"
+        ? (lastAssignedRank = checkPreviousTotalAndAssignRank(array, index, lastAssignedRank))
+        : undefined
+    })
+  );
+};
+
+const checkPreviousTotalAndAssignRank = (sheets, index, lastAssignedRank) =>
+    sheets[index - 1]?.total === sheets[index].total
+      ? lastAssignedRank  
+      : index + 1;
+
+const countResults = (processedMarkSheets) => {
+  let pass = 0;
+  let fail = 0;
+ processedMarkSheets.map(markSheet => markSheet.result === "pass" ? ++pass : ++fail);
+
+  return { pass, fail };
+};
+
+
+const processMarkSheets = (markSheets) => {
+  const processedMarkSheets = map(markSheets, processMarkSheet);    
+  const sortedMarkSheets = processedMarkSheets.sort((a, b) =>  {
+    if (a.result !== b.result) {
+    return a.result === "pass" ? -1 : 1;
+  }
+
+   return b.total - a.total;
 });
+  const rankedMarkSheets = assignRank(sortedMarkSheets);  
 
-const processMarkSheets = (markSheets) =>
-  assignRank(sort(map(markSheets, processMarkSheet), (a, b) => b.total - a.total));
+  return rankedMarkSheets;
+};
 
-const getInput = async () => {
+const readInputFile = async () => {
   const markSheets = await csv({
     colParser: {
       "column1": "omit",
@@ -56,15 +84,16 @@ const getInput = async () => {
   return markSheets;
 };
 
-const displayMarkSheets = async () => processMarkSheets(await getInput());
-
-const main = async () => {
-  const result = await displayMarkSheets();
+const displayResult = (result) => {
   console.table(result);
-  const { passCount, failCount } = getCounts(result);
-  console.log("Pass Count :", passCount);
-  console.log("Fail Count :", failCount);
+  const { pass, fail } = countResults(result);
+  console.log("Pass Count :", pass);
+  console.log("Fail Count :", fail);
 };
 
+const main = async () => {
+  const markSheets = await readInputFile();          
+  const processedMarkSheets = processMarkSheets(markSheets);
+  displayResult(processedMarkSheets);                        
+};
 main();
-
