@@ -34,19 +34,31 @@ const processMarkSheet = (markSheet) => {
   };
 };
 
-const assignRank = (markSheets) => {
-  let lastAssignedRank = 0;
-
-  return markSheets.map((markSheet, index, array) => ({
-    ...markSheet,
-    rank: (lastAssignedRank = checkPreviousTotalAndAssignRank(array, index, lastAssignedRank))
-  }));
-};
-
-const checkPreviousTotalAndAssignRank = (sheets, index, lastAssignedRank) =>
+const assignRank = (sheets, index, lastAssignedRank) =>
     sheets[index - 1]?.total === sheets[index].total
       ? lastAssignedRank  
       : index + 1;
+
+const assignRanks = (markSheets) => {
+  let lastAssignedRank = 0;
+
+  return markSheets.map((markSheet, index, array) => {
+    const rank = assignRank(array, index, lastAssignedRank); 
+    lastAssignedRank = rank; 
+
+    return {
+      ...markSheet, 
+      rank          
+    };
+  });
+};
+
+const descendingFunction = () => (a, b) => b.total - a.total;
+
+const getPassedRankMarkSheets = (passedMarkSheets) => {
+  const sortedPassedMarkSheets = [...passedMarkSheets].sort(descendingFunction);
+  return assignRanks(sortedPassedMarkSheets);
+};
 
 const processMarkSheets = (markSheets) => {
   const processedMarkSheets = map(markSheets, processMarkSheet);
@@ -54,8 +66,7 @@ const processMarkSheets = (markSheets) => {
   const passedMarkSheets  = indexedMarkSheets["pass"];
   const failedMarkSheets  = indexedMarkSheets["fail"];
 
-  const sortedPassMarkSheets = passedMarkSheets.sort((a, b) => b.total - a.total);
-  const rankedPassMarkSheets = assignRank(sortedPassMarkSheets);
+  const rankedPassMarkSheets = getPassedRankMarkSheets(passedMarkSheets);
 
   return {
     updatedMarkSheets: [...rankedPassMarkSheets, ...failedMarkSheets],
@@ -72,6 +83,7 @@ const readInputFile = async () => {
     },
     checkType: true,
   }).fromFile(inputData);
+
   return markSheets;
 };
 
