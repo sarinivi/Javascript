@@ -5,7 +5,7 @@ const { map, find, reduce } = pkg;
 const costData = "./cost.csv";
 const revenueData = "./revenue.csv";
 
-const revenueMonth = 12;
+const totalMonth = 12;
 const profitLimit = 300000;
 
 const costFields = ["ElectricBill", "GasBill", "EmployeeSalary", "Ingredients", "WaterBill", "ShopRent", "WifiBill"];
@@ -14,41 +14,41 @@ const revenueFields = ["coffee", "tea", "biscuit", "cake", "juice"];
 
 const getTotal = (data, array) =>  reduce(array, (sum, field) => sum + data[field],0);
 
-const getProfitLevel = (profit) => profit >= profitLimit ? "highProfit" : "smallProfit";
+const classifyProfit = (profit) => profit >= profitLimit ? "highProfit" : "smallProfit";
 
 const processCostAndRevenue = (cost, revenue) => {
-  const totalCost = getTotal(cost, costFields);
-  const totalRevenue = getTotal(revenue, revenueFields) * revenueMonth;
-  const profit = totalRevenue - totalCost;
+  const totalExpense = getTotal(cost, costFields);
+  const totalRevenue = getTotal(revenue, revenueFields) * totalMonth;
+  const profit = totalRevenue - totalExpense;
 
   return {
-    year: cost.Year,
-    totalCost: totalCost,
+    year: cost.year,
+    totalCost: totalExpense,
     totalRevenue: totalRevenue,
     profit: profit,
-    profitLevel: getProfitLevel(profit),
+    profitLevel: classifyProfit(profit),
   };
 };
 
-const processData = (costPerYear, revenuePerYear) =>
-  map(costPerYear, (cost) => {
-    const revenue = find(revenuePerYear, (revenue) => revenue.Year === cost.Year);
+const processData = (expense, revenueData) =>
+  map(expense, (cost) => {
+    const revenue = find(revenueData, (revenue) => revenue.year === cost.year);
 
     return processCostAndRevenue(cost, revenue);
   });
 
 const getInput = async () => {
-const costPerYear = await csv({ checkType: true }).fromFile(costData);
-const revenuePerYear = await csv({ checkType: true }).fromFile(revenueData);
+const expense = await csv({ checkType: true }).fromFile(costData);
+const revenue = await csv({ checkType: true }).fromFile(revenueData);
 
-  return { costPerYear, revenuePerYear };
+  return { expense, revenue };
 };
 
-const displayOutput = (data) => console.table(data);
+const display = (data) => console.table(data);
 
 const main = async () => {
-  const { costPerYear, revenuePerYear } = await getInput();
-  const profitData = processData(costPerYear, revenuePerYear);
-  displayOutput(profitData);
+  const { expense, revenue } = await getInput();
+  const profitData = processData(expense, revenue);
+  display(profitData);
 };
 main();
