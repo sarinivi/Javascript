@@ -1,19 +1,17 @@
 const { capitalize } = require('./capitalization.js')
 
 describe('Capitalize first letter',() => {
-    test('Display "hello" to "Hello"',() => {
-        expect(capitalize("hello")).toBe(("Hello"));
+    const cases = 
+    [
+        {input:"hello",expected:"Hello",display:"capitalized first letter"},
+        {input:123,expected:"invalid",display:"Invalid input"},
+        {input:"",expected:"invalid",display:"Invalid input"},
+        {input:"helloworld",expected:"Helloworld",display:" capitalized first letter"},
+        {input:"hello world",expected:"Hello world",display:"capitalized first letter"}
+    ]
+    cases.forEach(({input,expected,display}) => {
+      test(`Display "${expected}" when given "${display}"`, () => {
+      expect(capitalize(input)).toBe(expected);
     });
-    test('Display 123 to "invalid"',() => {
-        expect(capitalize(123)).toBe(("invalid"));
     });
-    test('Display "" to "invalid"',() => {
-        expect(capitalize("")).toBe(("invalid"));
     });
-    test('Display "helloworld" to "Helloworld"',() => {
-        expect(capitalize("helloworld")).toBe(("Helloworld"));
-    });
-    test('Display "hello world" to "Hello world"',() => {
-        expect(capitalize("hello world")).toBe(("Hello world"));
-    });
-}); 
